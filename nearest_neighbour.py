@@ -8,7 +8,7 @@ AMOUNT_OF_NODES = 10
 MAP_LENGTH = 50
 
 def generate_nodes(amount, map_length):
-    ''' Generates unique randomly positioned nodes '''
+    ''' Generates unique randomly positioned nodes. '''
     Node = namedtuple('Node', ['x', 'y'])
     nodes = []
     while len(nodes) < amount:
@@ -49,11 +49,13 @@ def nearest_neighbor(d_matrix, start_node=0):
         nearest_distance = np.inf
         nearest_node = None
 
+        # Starting at the first node, find the closest unvisited node
         for node_idx in range(1, number_of_nodes):
             if not visited[node_idx] and d_matrix[current_node, node_idx] < nearest_distance:
                 nearest_distance = d_matrix[current_node, node_idx]
                 nearest_node = node_idx
         
+        # Add that node to the path list and set it as the current position
         path.append(nearest_node)
         visited[nearest_node] = True
         total_distance += nearest_distance
@@ -64,7 +66,7 @@ def nearest_neighbor(d_matrix, start_node=0):
     return path, total_distance
 
 def plot_path(nodes, path):
-    ''' Plot the nodes and the path '''
+    ''' Plot the nodes and show the path get drawn in real time. '''
     x_values, y_values = zip(*nodes)
     
     # Create the figure and axis
