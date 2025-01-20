@@ -1,14 +1,8 @@
 from collections import namedtuple
 import random
-import matplotlib.pyplot as plt
 import numpy as np
-
-# For printing the plt visual on second monitor
-manager = plt.get_current_fig_manager()
-tk_window = manager.canvas.manager.window
-x_offset = 2500
-y_offset = 100
-tk_window.geometry(f"+{x_offset}+{y_offset}")
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 AMOUNT_OF_NODES = 10
 MAP_LENGTH = 50
@@ -64,31 +58,54 @@ def nearest_neighbor(d_matrix, start_node=0):
         visited[nearest_node] = True
         total_distance += nearest_distance
         current_node = nearest_node
-
+        
     # Return to starting node
     path.append(0)
-
     return path, total_distance
 
 def plot_path(nodes, path):
     ''' Plot the nodes and the path '''
     x_values, y_values = zip(*nodes)
-    plt.scatter(x_values, y_values)
+    
+    # Create the figure and axis
+    fig, ax = plt.subplots()
+    ax.scatter(x_values, y_values)
 
-    previous_node = path[0]
-    for node in path[1:]:
-        x_1, y_1 = nodes[previous_node]
-        x_2, y_2 = nodes[node]
-        plt.plot([x_1, x_2], [y_1, y_2])
-        previous_node = node
+    # Create an empty line object that will be updated during the animation
+    line, = ax.plot([], [], 'g-', lw=2)
+
+    ax.set_xlim(0, MAP_LENGTH)
+    ax.set_ylim(0, MAP_LENGTH)
+
+    # Line initialization function
+    def init():
+        line.set_data([], [])
+        return (line,)  
+
+    # Update function to draw each new line
+    def update(frame):
+        # Get the x and y coordinates for the path up to the current frame
+        path_x = [x_values[i] for i in path[:frame+1]]
+        path_y = [y_values[i] for i in path[:frame+1]]
+        
+        # Update the line with the new path data
+        line.set_data(path_x, path_y)
+        return (line,)
+
+    # Animate the path
+    ani = FuncAnimation(fig, update, frames=len(path), init_func=init, blit=True, interval=200)
 
     plt.show()
-
-def main():
-    sims = range(10, 5001, 20)
-    avgs = []
+    
+def get_aggregate_stats(min_sims, max_sims, step_size):
+    ''' Function starts by running min_sims simulations of the algorithm and records the total distances
+        of each, calculating the min, max and mean. It then increases the number of sims by step_size and
+        repeats the process until max_sims is reached (not included). The function then plots a distance vs.
+        number of sims graph with lines for min, max and mean. '''
+    sims = range(min_sims, max_sims, step_size)
     mins = []
     maxs = []
+    means = []
     for sim in sims:
         distances = []
         for _ in range(sim):
@@ -96,17 +113,23 @@ def main():
             d_matrix = create_distance_matrix(nodes)
             path, total_distance = nearest_neighbor(d_matrix)
             distances.append(total_distance)
-        mean = np.mean(distances)
-        avgs.append(mean)
         mins.append(min(distances))
         maxs.append(max(distances))
+        mean = np.mean(distances)
+        means.append(mean)
         print(mean)
-    plt.ylim(0, max(avgs)*2)
-    plt.plot(sims, avgs, c='blue')
+    plt.ylim(0, max(means)*2)
     plt.plot(sims, mins, c='green')
     plt.plot(sims, maxs, c='red')
+    plt.plot(sims, means, c='blue')
     plt.show()
-    #plot_path(nodes, path)
+
+def main():
+    nodes = generate_nodes(AMOUNT_OF_NODES, MAP_LENGTH)
+    d_matrix = create_distance_matrix(nodes)
+    path, total_distance = nearest_neighbor(d_matrix)
+    plot_path(nodes, path)
+    #get_aggregate_stats(10, 2001, 20)
 
 if __name__ == "__main__":
     main()
