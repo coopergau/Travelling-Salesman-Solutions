@@ -7,3 +7,11 @@ This project will be an exploration and comparison of different methods used to 
 ## Nearest Neighbour Algorithm
 
 This algorithm chooses the closest city as the next one to visit until every city has been visited and then returns to the starting city.
+
+### To Do
+- impliment the four algos
+- write some basic tests like:
+    - path starts and ends with same node
+    - no duplicate nodes in paths
+    - make a non random graph and make sure distance is as expected
+    - maybe see what happens when there are 3 nodes (the min allowed)
