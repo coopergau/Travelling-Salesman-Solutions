@@ -27,4 +27,5 @@ def nearest_neighbour(d_matrix, start_node=0):
         
     # Return to starting node
     path.append(0)
+    total_distance += d_matrix[current_node][0]
     return path, total_distance

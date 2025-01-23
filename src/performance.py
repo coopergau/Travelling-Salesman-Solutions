@@ -1,7 +1,10 @@
-# Fix imports and stuff
-# kinda rafactor this whole thing when the other algos get made
+from utils import generate_nodes, create_distance_matrix
+import numpy as np
+import matplotlib.pyplot as plt
 
-def get_aggregate_stats(min_sims, max_sims, step_size):
+# Maybe rework or reorganize this ---------------------------------------------------------------------------
+
+def get_aggregate_stats(amount_of_nodes, map_length, min_sims, max_sims, step_size, solving_function):
     ''' Function starts by running min_sims simulations of the algorithm and records the total distances
         of each, calculating the min, max and mean. It then increases the number of sims by step_size and
         repeats the process until max_sims is reached (not included). The function then plots a distance vs.
@@ -13,9 +16,9 @@ def get_aggregate_stats(min_sims, max_sims, step_size):
     for sim in sims:
         distances = []
         for _ in range(sim):
-            nodes = generate_nodes(AMOUNT_OF_NODES, MAP_LENGTH)
+            nodes = generate_nodes(amount_of_nodes, map_length)
             d_matrix = create_distance_matrix(nodes)
-            path, total_distance = nearest_neighbor(d_matrix)
+            path, total_distance = solving_function(d_matrix)
             distances.append(total_distance)
         mins.append(min(distances))
         maxs.append(max(distances))
